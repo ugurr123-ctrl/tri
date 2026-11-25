@@ -23,7 +23,7 @@ All snippets, folders, settings, and usage statistics are stored **100% locally*
 ## Installation & Build Instructions
 
 ### Prerequisites
-- Node.js 18+ and npm
+- Node.js 20.19+ or 22.12+ and npm
 - Google Chrome (v114+) or Chromium-based browser
 
 ### 1. Install dependencies
@@ -175,4 +175,4 @@ Planned production rollout:
 1. **Checkout**: Redirect users from the Plan page to a hosted Stripe Checkout or Lemon Squeezy checkout session for the **$14.99 one-time Pro purchase**.
 2. **Server-Side License Verification**: Deploy a lightweight backend endpoint (e.g. Cloudflare Workers / Cloud Run) that verifies webhook payment completion and issues short-lived cryptographically signed JWT/Ed25519 entitlement tokens bound to a license ID.
 3. **Extension Adapter**: Implement `ServerVerifiedEntitlementProvider` conforming to `EntitlementProvider`, verifying token signatures locally using Web Crypto (`crypto.subtle.verify`) with the embedded public key and refreshing periodically in `background.js`.
-4. **Remove Dev Preview**: Set `ALLOW_DEV_ENTITLEMENT_PREVIEW = false` in `src/core/entitlement/entitlementService.ts` prior to Chrome Web Store submission.
+4. **Production Enforcement**: `ALLOW_DEV_ENTITLEMENT_PREVIEW` is bound strictly to `import.meta.env.DEV`, so production builds (`npm run build`) automatically strip development-only Pro toggling and enforce Free quotas until a server-verified provider is configured.

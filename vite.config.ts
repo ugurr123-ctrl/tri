@@ -29,6 +29,7 @@ function buildExtensionScriptsPlugin() {
         sourcemap: false,
         define: {
           'process.env.NODE_ENV': '"production"',
+          'import.meta.env.DEV': 'false',
         },
       });
 
@@ -44,6 +45,7 @@ function buildExtensionScriptsPlugin() {
         sourcemap: false,
         define: {
           'process.env.NODE_ENV': '"production"',
+          'import.meta.env.DEV': 'false',
         },
       });
 

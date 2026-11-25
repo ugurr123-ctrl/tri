@@ -8,12 +8,13 @@ import {
 } from './types';
 
 /**
- * Development preview flag.
- * Production Chrome Web Store releases should replace LocalEntitlementService with a
- * server-verified license adapter (e.g. Stripe Checkout + signed JWT verification endpoint).
- * No fake payment flows or insecure client-only license keys are implemented here.
+ * Development preview flag — strictly enabled ONLY in Vite dev mode (`npm run dev`).
+ * In production builds (`npm run build`), `import.meta.env.DEV` is statically compiled to `false`
+ * across popup, options, content script, and service worker bundles so local storage flags
+ * can never unlock Pro features without a server-verified license adapter.
  */
-export const ALLOW_DEV_ENTITLEMENT_PREVIEW = true;
+export const ALLOW_DEV_ENTITLEMENT_PREVIEW: boolean =
+  import.meta.env.DEV === true;
 
 export function evaluateFeatureAccess(
   state: EntitlementState,
@@ -35,7 +36,7 @@ export function evaluateFeatureAccess(
 
 class LocalEntitlementService implements EntitlementProvider {
   async getEntitlement(): Promise<EntitlementState> {
-    if (ALLOW_DEV_ENTITLEMENT_PREVIEW) {
+    if (import.meta.env.DEV) {
       const devTier = await storageAdapter.get<PlanTier>(STORAGE_KEYS.DEV_ENTITLEMENT_TIER);
       if (devTier === 'pro') {
         return {
@@ -64,10 +65,10 @@ class LocalEntitlementService implements EntitlementProvider {
 
   /**
    * Development-only helper to inspect Free vs Pro UX states during local development and QA.
-   * Explicitly labeled in the UI as development-only — never presented as a real purchase or license.
+   * Explicitly labeled in the UI as development-only — completely compiled out of production builds.
    */
   async setDevelopmentPreviewTier(tier: PlanTier): Promise<EntitlementState> {
-    if (!ALLOW_DEV_ENTITLEMENT_PREVIEW) {
+    if (!import.meta.env.DEV) {
       return this.getEntitlement();
     }
     await storageAdapter.set(STORAGE_KEYS.DEV_ENTITLEMENT_TIER, tier);

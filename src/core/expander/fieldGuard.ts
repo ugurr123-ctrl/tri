@@ -44,7 +44,7 @@ const SENSITIVE_AUTOCOMPLETE_TOKENS = new Set([
 ]);
 
 const SENSITIVE_FIELD_PATTERN =
-  /(password|passwd|pwd|passcode|passphrase|pin\b|cvv|cvc|csc|card[-_ ]?num|credit[-_ ]?card|debit[-_ ]?card|cc[-_ ]?num|cc[-_ ]?exp|expir(y|ation)|iban|swift[-_ ]?bic|routing[-_ ]?num|bank[-_ ]?account|ssn|social[-_ ]?security|tax[-_ ]?id|otp|2fa|mfa|totp|auth[-_ ]?code|verification[-_ ]?code|security[-_ ]?code|secret[-_ ]?key|api[-_ ]?key|private[-_ ]?key|seed[-_ ]?phrase|recovery[-_ ]?phrase)/i;
+  /(password|passwd|passcode|passphrase|pin[-_ ]?code|card[-_ ]?num|cardnumber|cardholder|card[-_ ]?code|credit[-_ ]?card|debit[-_ ]?card|cc[-_ ]?num|cc[-_ ]?exp|expir(y|ation)|swift[-_ ]?bic|routing[-_ ]?num|bank[-_ ]?account|social[-_ ]?security|tax[-_ ]?id|one[-_ ]?time|auth[-_ ]?code|verification[-_ ]?code|security[-_ ]?code|secret[-_ ]?key|api[-_ ]?key|private[-_ ]?key|seed[-_ ]?phrase|recovery[-_ ]?phrase|(?<![a-z0-9])(pwd|pin|cvv|cvc|csc|iban|ssn|otp|2fa|mfa|totp)(?![a-z0-9]))/i;
 
 const HARD_BLOCKED_PAYMENT_HOSTS = [
   'stripe.com',
@@ -213,6 +213,13 @@ export function isSupportedEditableElement(node: EventTarget | null): node is HT
   if (node.closest('[data-tavriqelo-ui="true"]')) {
     return false;
   }
+  const rootNode = node.getRootNode();
+  if (
+    rootNode instanceof ShadowRoot &&
+    rootNode.host?.getAttribute('data-tavriqelo-ui') === 'true'
+  ) {
+    return false;
+  }
 
   if (node instanceof HTMLTextAreaElement) {
     return !node.disabled && !node.readOnly;
@@ -225,6 +232,12 @@ export function isSupportedEditableElement(node: EventTarget | null): node is HT
   }
 
   if (node.isContentEditable) {
+    if (
+      node.getAttribute('aria-readonly') === 'true' ||
+      node.getAttribute('aria-disabled') === 'true'
+    ) {
+      return false;
+    }
     // Gracefully skip canvas-backed / custom non-standard virtual editors where DOM mutation breaks state
     if (
       node.classList.contains('monaco-mouse-cursor-text') ||

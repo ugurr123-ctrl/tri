@@ -3,12 +3,20 @@ import { ensureStorageInitialized } from '../services/storage/snippetRepository'
 import { recordExpansionStats } from '../services/storage/statsService';
 
 const OPTIONAL_SCRIPT_ID = 'tavriqelo-optional-sites';
+let syncQueue: Promise<void> = Promise.resolve();
 
 /**
  * Synchronizes dynamically registered content scripts for any optional website permissions
  * granted by the user via chrome.permissions.request().
+ * Serialized to prevent concurrent register/update race conditions and excludes core manifest
+ * origins so Chrome does not inject content.js twice when all-sites permission is granted.
  */
-async function syncOptionalContentScripts(): Promise<void> {
+function syncOptionalContentScripts(): Promise<void> {
+  syncQueue = syncQueue.then(runOptionalContentScriptSync, runOptionalContentScriptSync);
+  return syncQueue;
+}
+
+async function runOptionalContentScriptSync(): Promise<void> {
   if (typeof chrome === 'undefined' || !chrome.permissions || !chrome.scripting) {
     return;
   }
@@ -32,6 +40,7 @@ async function syncOptionalContentScripts(): Promise<void> {
     const scriptConfig: chrome.scripting.RegisteredContentScript = {
       id: OPTIONAL_SCRIPT_ID,
       matches: optionalOrigins,
+      excludeMatches: [...CORE_MANIFEST_ORIGINS],
       js: ['content.js'],
       runAt: 'document_idle',
       allFrames: true,

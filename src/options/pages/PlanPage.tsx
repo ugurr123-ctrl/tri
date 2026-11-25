@@ -230,8 +230,8 @@ export function PlanPage({
         </p>
       </section>
 
-      {/* Development-Only Test Entitlement Switcher */}
-      {ALLOW_DEV_ENTITLEMENT_PREVIEW && (
+      {/* Development-Only Test Entitlement Switcher (stripped in production builds) */}
+      {import.meta.env.DEV && ALLOW_DEV_ENTITLEMENT_PREVIEW && (
         <section className="rounded-xl border border-amber-200 dark:border-amber-900/60 bg-amber-50/70 dark:bg-amber-950/20 p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="space-y-1">
             <div className="flex items-center gap-2 text-xs font-semibold text-amber-900 dark:text-amber-200">
