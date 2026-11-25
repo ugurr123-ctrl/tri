@@ -1,0 +1,6 @@
+{
+  "name": "Tavriqelo – Smart Text Expander",
+  "description": "Privacy-first Google Chrome Extension (Manifest V3) that expands keyboard shortcuts into reusable text snippets with dynamic variables across Gmail, Outlook, LinkedIn, ChatGPT, and other websites.",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
+}

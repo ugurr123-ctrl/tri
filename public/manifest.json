@@ -1,0 +1,62 @@
+{
+  "manifest_version": 3,
+  "name": "Tavriqelo – Smart Text Expander",
+  "short_name": "Tavriqelo",
+  "version": "1.0.0",
+  "description": "Expand short keyboard shortcuts into reusable text snippets locally across Gmail, Outlook, LinkedIn, ChatGPT, and supported sites.",
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "action": {
+    "default_title": "Tavriqelo – Smart Text Expander",
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png",
+      "48": "icons/icon48.png"
+    }
+  },
+  "options_page": "options.html",
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "permissions": [
+    "storage",
+    "scripting",
+    "activeTab"
+  ],
+  "optional_host_permissions": [
+    "https://*/*",
+    "http://*/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "https://mail.google.com/*",
+        "https://outlook.live.com/*",
+        "https://outlook.office.com/*",
+        "https://outlook.office365.com/*",
+        "https://www.linkedin.com/*",
+        "https://chatgpt.com/*",
+        "https://chat.openai.com/*",
+        "https://app.slack.com/*",
+        "https://www.notion.so/*",
+        "https://notion.so/*",
+        "https://github.com/*",
+        "https://x.com/*"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "run_at": "document_idle",
+      "all_frames": true
+    }
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'"
+  }
+}
